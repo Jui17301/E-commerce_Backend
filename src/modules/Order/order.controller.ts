@@ -2,11 +2,20 @@
 import { Request, Response } from 'express';
 import { OrderServices } from './order.service';
 import { Order } from './order.model';
+import { ProductServices } from '../Product/product.service';
+import { TProduct } from '../Product/product.interface';
+
 
 const createOrder = async (req: Request, res: Response) => {
+  
   try {
-    const {orderData,quantity} = req.body;
-    const product = await Order.findById(orderData);
+    const orderData = req.body;
+
+    // Check if the product exists
+    const product = await ProductServices.getProductById(
+      orderData.productId
+    );
+
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -14,28 +23,44 @@ const createOrder = async (req: Request, res: Response) => {
       });
     }
 
-    if (orderData.inventory.quantity < quantity) {
+    // Check if the ordered quantity exceeds the available quantity
+    if (orderData.quantity > (product.inventory?.quantity || 0)) {
       return res.status(400).json({
         success: false,
         message: 'Insufficient quantity available in inventory',
       });
     }
-  
-    const result = await OrderServices.createOrder({orderData,quantity});
 
-    await result.save();
-    orderData.inventory.quantity -= quantity;
-    orderData.inventory.inStock =orderData.inventory.quantity > 0;
-    await product.save();
+    // Update the inventory quantity and inStock property
+    if (product.inventory) {
+      // Calculate updated quantity and inStock
+      const updatedQuantity =
+        (product.inventory.quantity || 0) - orderData.quantity;
+      const updatedInStock = updatedQuantity > 0;
 
+      // Prepare update data
+      const updateData: Partial<TProduct> = {
+        inventory: {
+          quantity: updatedQuantity,
+          inStock: updatedInStock,
+        },
+      };
+
+      await ProductServices.updateProductById(
+        product._id.toString(),
+        updateData
+      );
+    }
+    const result = await OrderServices.createOrder(orderData);
 
     res.status(200).json({
       success: true,
       message: 'Order created successfully!',
-
       data: result,
     });
-  } catch (error) {
+  }
+  
+  catch (error) {
     res.status(500).json({
       success: false,
       message: 'Something went wrong',
