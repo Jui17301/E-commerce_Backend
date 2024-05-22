@@ -1,22 +1,32 @@
 import {z} from 'zod';
 
 const variantValidationSchema = z.object({
-  type: z.string(),
-  value: z.string()
+  type: z.string().min(1,{message:'Type is required'}),
+  value: z.string().min(1,{message:'Value is required'})
 });
 
  const inventoryValidationSchema = z.object({
-  quantity: z.number(),
-  inStock: z.boolean()
+  quantity: z
+  .number()
+  .int()
+  .nonnegative({ message: 'Quantity must be a non-negative integer' }),
+inStock: z.boolean().refine((val) => typeof val === 'boolean', {
+  message: 'InStock must be a boolean',
+}),
 });
 
-export const productValidationSchema = z.object({
-  name: z.string(),
-  description: z.string(),
-  price: z.number(),
-  category: z.string(),
-  tags: z.array(z.string()),
-  variants: z.array(variantValidationSchema),
-  inventory: inventoryValidationSchema
+ const productValidationSchema = z.object({
+  name: z.string().min(1, { message: 'Name is required' }),
+  description: z.string().min(1, { message: 'Description is required' }),
+  price: z
+    .number()
+    .nonnegative({ message: 'Price must be a non-negative number' }),
+  category: z.string().min(1, { message: 'Category is required' }),
+  tags: z
+    .array(z.string().min(1, { message: 'Tag cannot be empty' }))
+    .min(1, { message: 'Tags are required' }),
+  variants: z.array(variantValidationSchema).optional(),
+  inventory: inventoryValidationSchema.optional(),
 });
 
+export default productValidationSchema
