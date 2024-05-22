@@ -1,15 +1,22 @@
 import { TOrder } from './order.interface';
 import { Order } from './order.model';
 
-const createOrderIntoDB = async (payload: TOrder) => {
+const createOrder = async (payload: TOrder) => {
   const result = await Order.create(payload);
   return result;
 };
 
-const getAllOrdersFromDB = async () => {
-  return;
+const getAllOrder = async () => {
+  const result = await Order.find();
+  return result;
+};
+const getOrderByEmail = async (email: string) => {
+  const result = await Order.findOne({ email:email });
+  return result;
 };
 
 export const OrderServices = {
-  createOrderIntoDB,
+  createOrder,
+  getAllOrder,
+  getOrderByEmail
 };
