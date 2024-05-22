@@ -11,9 +11,29 @@ const getAllProducts = async()=>{
   const result = await Product.find();
   return result;
 }
+const getProductById = async(id:string)=>{
+ 
+  const result = await Product.findOne({_id:id});
+  return result;
+}
+const updateProductById = async(id:string,
+  updateData: Partial<TProduct>
+) => {
+  const result = await Product.findByIdAndUpdate({ _id: id }, updateData, {
+    new: true,
+  });
+  return result;
+}
 
+const deleteProductById = async (id: string) => {
+  const result = await Product.findByIdAndDelete({ _id: id });
+  return result;
+};
 
 export const ProductServices={
   createProductIntoDB,
-  getAllProducts
+  getAllProducts,
+  getProductById,
+  updateProductById,
+  deleteProductById
 }
