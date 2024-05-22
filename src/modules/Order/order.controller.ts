@@ -32,6 +32,7 @@ const createOrder = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: 'Order created successfully!',
+
       data: result,
     });
   } catch (error) {
@@ -44,12 +45,25 @@ const createOrder = async (req: Request, res: Response) => {
 };
 const getAllOrder = async (req: Request, res: Response) => {
   try {
+     
+    const email: string | undefined = req.query.email as string;
+
+    if (email && typeof email === 'string') {
+      const result = await OrderServices.getOrderByEmail(email);
+      return res.status(200).json({
+        success: true,
+        message: 'Orders fetched successfully for user email!',
+        data: result,
+      });
+    } 
+    else{
     const result = await OrderServices.getAllOrder();
     res.status(200).json({
       success: true,
       message:  "Orders fetched successfully!",
       data: result,
     });
+  }
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -58,27 +72,27 @@ const getAllOrder = async (req: Request, res: Response) => {
     });
   }
 };
-const getOrderByEmail = async (req: Request, res: Response) => {
-  try {
-    const { orderEmail } = req.params;
-    const result = await OrderServices.getOrderByEmail(orderEmail);
+// const getOrderByEmail = async (req: Request, res: Response) => {
+//   try {
+//     const { orderEmail } = req.params;
+//     const result = await OrderServices.getOrderByEmail(orderEmail);
 
-    res.status(200).json({
-      success: true,
-      message:"Orders fetched successfully for user email!",
-      data: result,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Could Not Fetched Successfully",
-      error: error,
-    });
-  }
-};
+//     res.status(200).json({
+//       success: true,
+//       message:"Orders fetched successfully for user email!",
+//       data: result,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: "Could Not Fetched Successfully",
+//       error: error,
+//     });
+//   }
+// };
 
 export const OrderControllers = {
   createOrder,
   getAllOrder,
-  getOrderByEmail
+  // getOrderByEmail
 };

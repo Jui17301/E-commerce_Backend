@@ -23,6 +23,18 @@ const createProduct = async (req: Request, res: Response) => {
 };
 const getAllProducts = async (req: Request, res: Response) => {
   try {
+    const searchTerm = req.query.searchTerm as string;
+
+    if (searchTerm) {
+      const result = await ProductServices.searchProductByItem(searchTerm);
+      return res.status(200).json({
+        success: true,
+        message: `Products matching search term '${searchTerm}' fetched successfully!`,
+        data: result,
+      });
+    }
+
+    else{
     const result = await ProductServices.getAllProducts();
 
     res.status(200).json({
@@ -30,7 +42,9 @@ const getAllProducts = async (req: Request, res: Response) => {
       message: "Products fetched successfully!",
       data: result,
     });
-  } catch (error) {
+  }
+  } 
+  catch (error) {
     res.status(500).json({
       success: false,
       message: "Could Not Fetched Successfully",
@@ -97,36 +111,36 @@ const deleteProductById = async (req: Request, res: Response) => {
     });
   }
 };
-const searchProductByItem = async (req: Request, res: Response) => {
-  try {
-    const searchTerm = req.query.searchTerm;
+// const searchProductByItem = async (req: Request, res: Response) => {
+//   try {
+//     const searchTerm = req.query.searchTerm;
 
-    if (typeof searchTerm !== "string") {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid search term",
-      });
-    }
+//     if (typeof searchTerm !== "string") {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Invalid search term",
+//       });
+//     }
 
-    const result = await ProductServices.searchProductByItem(searchTerm);
-    res.status(200).json({
-      success: true,
-      message: `Products matching search term '${searchTerm}' fetched successfully!`,
-      data: result,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Something went wrong",
-      error: error,
-    });
-  }
-};
+//     const result = await ProductServices.searchProductByItem(searchTerm);
+//     res.status(200).json({
+//       success: true,
+//       message: `Products matching search term '${searchTerm}' fetched successfully!`,
+//       data: result,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: "Something went wrong",
+//       error: error,
+//     });
+//   }
+// };
 export const ProductControllers = {
   createProduct,
   getAllProducts,
   getProductById,
   updateProductById,
   deleteProductById,
-  searchProductByItem,
+  // searchProductByItem,
 };
