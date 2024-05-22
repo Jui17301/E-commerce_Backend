@@ -1,6 +1,6 @@
-import { TProduct } from "./product.interface";
-import { Product } from "./product.model";
 
+import { Product } from "./product.model";
+import { TProduct } from "./product.interface";
 
 
 const createProductIntoDB = async(payLoad:TProduct)=>{
